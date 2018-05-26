@@ -97,4 +97,4 @@
 
 ## APK下载
 
-[LauncherView下载](https://github.com/freedomeden/LauncherView/blob/master/app/apk/app-debug.apk)
+[LauncherView下载](https://raw.githubusercontent.com/freedomeden/LauncherView/master/app/apk/app-debug.apk)
