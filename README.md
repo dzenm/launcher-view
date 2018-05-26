@@ -87,7 +87,7 @@
 
 ##查看效果图
 
-
+![效果图](https://github.com/freedomeden/LauncherView/blob/master/picture/photo.gif?raw=true)
 
 
 
@@ -96,3 +96,5 @@
 
 
 ##APK下载
+
+[](https://github.com/freedomeden/LauncherView/blob/master/picture/photo.gif?raw=true)
