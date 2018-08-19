@@ -4,7 +4,6 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
-import android.animation.TypeEvaluator;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.os.Handler;
@@ -17,21 +16,8 @@ import android.widget.RelativeLayout;
 
 import com.din.launcherview.R;
 
-import java.util.ArrayList;
-import java.util.Collection;
-
-/**
- * Author:    Diamond_Lin
- * Version    V1.0
- * Date:      16/10/18 下午3:30
- * Description:
- * Modification  History:
- * Date         	Author        		Version        	Description
- * -----------------------------------------------------------------------------------
- * 16/10/18      Diamond_Lin            1.0                    1.0
- * Why & What is modified:
- */
 public class LauncherView extends RelativeLayout {
+
     private int mHeight;
     private int mWidth;
     private int dp80 = dp2px(getContext(), 80);
@@ -54,7 +40,7 @@ public class LauncherView extends RelativeLayout {
     private void init() {
 
         LayoutParams lp = new LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        lp.addRule(CENTER_HORIZONTAL, TRUE);//这里的TRUE 要注意 不是true
+        lp.addRule(CENTER_HORIZONTAL, TRUE);    //这里的TRUE 要注意 不是true
         lp.addRule(CENTER_VERTICAL, TRUE);
         //  图片设置margin
         lp.setMargins(0, 0, 0, dp80);
@@ -120,8 +106,7 @@ public class LauncherView extends RelativeLayout {
         mHeight = getMeasuredHeight();
         initPath();
     }
-
-
+    
     //  动画启动
     public void start() {
         removeAllViews();
@@ -192,7 +177,6 @@ public class LauncherView extends RelativeLayout {
 
     }
 
-
     private float getScale(ImageView target) {
         if (target == red)
             return 3.0f;
@@ -204,7 +188,6 @@ public class LauncherView extends RelativeLayout {
             return 3.5f;
         return 2f;
     }
-
 
     //  设置动画结束之后的图片控件ID
     private int loginId, slogoId;
@@ -251,20 +234,6 @@ public class LauncherView extends RelativeLayout {
         }
     }
 
-
-    public class ViewObj {
-        private final ImageView red;
-
-        public ViewObj(ImageView red) {
-            this.red = red;
-        }
-
-        public void setFabLoc(ViewPoint newLoc) {
-            red.setTranslationX(newLoc.x);
-            red.setTranslationY(newLoc.y);
-        }
-    }
-
     /**
      * dp转px
      *
@@ -275,162 +244,5 @@ public class LauncherView extends RelativeLayout {
     public static int dp2px(Context context, float dpValue) {
         final float scale = context.getResources().getDisplayMetrics().density;
         return (int) (dpValue * scale + 0.5f);
-    }
-
-    /**
-     * View的路径
-     */
-    public class ViewPath {
-        public static final int MOVE = 0;
-        public static final int LINE = 1;
-        public static final int QUAD = 2;
-        public static final int CURVE = 3;
-
-        private ArrayList<ViewPoint> mPoints;
-
-
-        public ViewPath() {
-            mPoints = new ArrayList<>();
-        }
-
-        public void moveTo(float x, float y) {
-            mPoints.add(ViewPoint.moveTo(x, y, MOVE));
-        }
-
-        public void lineTo(float x, float y) {
-            mPoints.add(ViewPoint.lineTo(x, y, LINE));
-        }
-
-        public void curveTo(float x, float y, float x1, float y1, float x2, float y2) {
-            mPoints.add(ViewPoint.curveTo(x, y, x1, y1, x2, y2, CURVE));
-        }
-
-        public void quadTo(float x, float y, float x1, float y1) {
-            mPoints.add(ViewPoint.quadTo(x, y, x1, y1, QUAD));
-        }
-
-        public Collection<ViewPoint> getPoints() {
-            return mPoints;
-        }
-    }
-
-
-    /**
-     * ViewPath求值
-     */
-    public class ViewPathEvaluator implements TypeEvaluator<ViewPoint> {
-
-        public ViewPathEvaluator() {
-        }
-
-        @Override
-        public ViewPoint evaluate(float t, ViewPoint startValue, ViewPoint endValue) {
-
-            float x, y;
-            float startX, startY;
-
-            if (endValue.operation == ViewPath.LINE) {
-
-                startX = (startValue.operation == ViewPath.QUAD) ? startValue.x1 : startValue.x;
-
-                startX = (startValue.operation == ViewPath.CURVE) ? startValue.x2 : startX;
-
-                startY = (startValue.operation == ViewPath.QUAD) ? startValue.y1 : startValue.y;
-
-                startY = (startValue.operation == ViewPath.CURVE) ? startValue.y2 : startY;
-
-                x = startX + t * (endValue.x - startX);
-                y = startY + t * (endValue.y - startY);
-            } else if (endValue.operation == ViewPath.CURVE) {
-
-                startX = (startValue.operation == ViewPath.QUAD) ? startValue.x1 : startValue.x;
-                startY = (startValue.operation == ViewPath.QUAD) ? startValue.y1 : startValue.y;
-
-                float oneMinusT = 1 - t;
-                x = oneMinusT * oneMinusT * oneMinusT * startX +
-                        3 * oneMinusT * oneMinusT * t * endValue.x +
-                        3 * oneMinusT * t * t * endValue.x1 +
-                        t * t * t * endValue.x2;
-
-                y = oneMinusT * oneMinusT * oneMinusT * startY +
-                        3 * oneMinusT * oneMinusT * t * endValue.y +
-                        3 * oneMinusT * t * t * endValue.y1 +
-                        t * t * t * endValue.y2;
-            } else if (endValue.operation == ViewPath.MOVE) {
-                x = endValue.x;
-                y = endValue.y;
-            } else if (endValue.operation == ViewPath.QUAD) {
-
-                startX = (startValue.operation == ViewPath.CURVE) ? startValue.x2 : startValue.x;
-                startY = (startValue.operation == ViewPath.CURVE) ? startValue.y2 : startValue.y;
-                float oneMinusT = 1 - t;
-                x = oneMinusT * oneMinusT * startX +
-                        2 * oneMinusT * t * endValue.x +
-                        t * t * endValue.x1;
-                y = oneMinusT * oneMinusT * startY +
-                        2 * oneMinusT * t * endValue.y +
-                        t * t * endValue.y1;
-            } else {
-                x = endValue.x;
-                y = endValue.y;
-            }
-            return new ViewPoint(x, y);
-        }
-    }
-
-    public static class ViewPoint {
-        float x, y;
-
-        float x1, y1;
-
-        float x2, y2;
-
-        int operation;
-
-        public ViewPoint(float x, float y) {
-            this.x = x;
-            this.y = y;
-        }
-
-        public static ViewPoint moveTo(float x, float y, int operation) {
-            return new ViewPoint(x, y, operation);
-        }
-
-        public static ViewPoint lineTo(float x, float y, int operation) {
-            return new ViewPoint(x, y, operation);
-        }
-
-        public static ViewPoint curveTo(float x, float y, float x1, float y1, float x2, float y2, int operation) {
-            return new ViewPoint(x, y, x1, y1, x2, y2, operation);
-        }
-
-        public static ViewPoint quadTo(float x, float y, float x1, float y1, int operation) {
-            return new ViewPoint(x, y, x1, y1, operation);
-        }
-
-
-        private ViewPoint(float x, float y, int operation) {
-            this.x = x;
-            this.y = y;
-            this.operation = operation;
-        }
-
-        public ViewPoint(float x, float y, float x1, float y1, int operation) {
-            this.x = x;
-            this.y = y;
-            this.x1 = x1;
-            this.y1 = y1;
-            this.operation = operation;
-        }
-
-        public ViewPoint(float x, float y, float x1, float y1, float x2, float y2, int operation) {
-            this.x = x;
-            this.y = y;
-            this.x1 = x1;
-            this.y1 = y1;
-            this.x2 = x2;
-            this.y2 = y2;
-            this.operation = operation;
-        }
     }
 }
